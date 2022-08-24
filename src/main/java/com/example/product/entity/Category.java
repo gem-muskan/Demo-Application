@@ -1,15 +1,11 @@
 package com.example.product.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
+/**
+ * Category*/
 @Entity
-@Table(name="CATEGORY")
+@Table (name = "CATEGORY")
 public class Category extends Auditing {
 
 
@@ -69,9 +65,13 @@ public class Category extends Auditing {
         this.categoryDescription = categoryDescription;
     }
 
+    /** Constructor*/
     public Category() {
 
     }
+
+    /**
+     * Constructor of Category Class*/
 
     public Category(String categoryName, String categoryDescription, boolean isActive, boolean isDeleted) {
         this.categoryName = categoryName;

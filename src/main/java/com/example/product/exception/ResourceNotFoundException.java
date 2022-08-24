@@ -1,7 +1,7 @@
 package com.example.product.exception;
 
-import java.util.Date;
 
+/** Exception*/
 public class ResourceNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

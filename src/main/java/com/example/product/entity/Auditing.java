@@ -1,14 +1,14 @@
 package com.example.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 
-import java.io.Serializable;
-import java.util.Date;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -17,12 +17,10 @@ import java.util.Date;
         allowGetters = true
 )
 public abstract class Auditing implements Serializable {
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
     private Date createdAt;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
@@ -31,7 +29,6 @@ public abstract class Auditing implements Serializable {
     public Date getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }

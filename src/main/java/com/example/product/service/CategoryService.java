@@ -1,8 +1,11 @@
 package com.example.product.service;
 
+import com.example.product.controller.CategoryController;
 import com.example.product.entity.Category;
 import com.example.product.exception.ResourceNotFoundException;
 import com.example.product.repository.CategoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,8 @@ public class CategoryService {
 
     @Autowired
     CategoryRepository categoryRepo;
+
+    Logger log = LoggerFactory.getLogger(CategoryController.class);
 
     public List<Category> getAllCategories()
     {

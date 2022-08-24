@@ -2,13 +2,16 @@ package com.example.product.controller;
 
 import com.example.product.entity.Category;
 import com.example.product.exception.ResourceNotFoundException;
+import com.example.product.service.CategoryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,16 +34,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoryController.class)
+@RunWith(SpringRunner.class)
 class CategoryControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    com.example.product.service.CategoryService testCategoryService;
+    private CategoryService testCategoryService;
 
     @InjectMocks
-    CategoryController testCategoryController;
+    private CategoryController testCategoryController;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -96,6 +101,8 @@ class CategoryControllerTest {
 
         this.mockMvc.perform(get("/category/{categoryId}",categoryId))
                 .andExpect(status().isNotFound());
+
+
     }
 
     @Test
@@ -112,12 +119,16 @@ class CategoryControllerTest {
         cat1.setCreatedAt(new Date());
         cat1.setUpdatedAt(new Date());
 
-        when(this.testCategoryService.addCategory(cat1)).thenReturn(cat1);
+        Mockito.when(testCategoryService.addCategory(Mockito.any(Category.class))).thenReturn(cat1);
 
         this.mockMvc.perform(
-                post("/category").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(cat1 )))
+                post("/category")
+                .content(objectMapper.writeValueAsString(cat1 ))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.categoryId").value(1))
+                .andExpect(jsonPath("$.categoryName").value("some-name"))
+                .andExpect(jsonPath("$.categoryDescription").value("some-description"))
                 .andDo(print());
     }
 
@@ -132,31 +143,38 @@ class CategoryControllerTest {
         testCategory.setCategoryDescription("some-description");
 
 
-        when(this.testCategoryService.updateCategory(categoryId,testCategory)).thenReturn(testCategory);
+        Mockito.when(this.testCategoryService.updateCategory(Mockito.any(Integer.class),Mockito.any(Category.class))).thenReturn(testCategory);
 
         this.mockMvc.perform(put("/category/{categoryId}",categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testCategory)))
                         .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.categoryId").value(1))
+                        .andExpect(jsonPath("$.categoryName").value("some-name"))
+                        .andExpect(jsonPath("$.categoryDescription").value("some-description"))
                         .andDo(print());
     }
 
     @Test
     void updateCategoryWhenCategoryDoesNotExistThenReturnNotFound() throws Exception {
 
-//        Integer categoryId=1;
-//        Category category=new Category();
-//
-//        when(this.testCategoryService.updateCategory(categoryId,category)).thenThrow( ResourceNotFoundException.class);
-//
-//        this.mockMvc.perform(put("/category/{categoryId}",categoryId)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(category)))
-//                        .andExpect(status().isNotFound());
+        Integer categoryId=1;
+        Category testCategory=new Category();
+        testCategory.setCategoryId(1);
+        testCategory.setCategoryName("some-name");
+        testCategory.setCategoryDescription("some-description");
+
+        Mockito.when(testCategoryService.updateCategory(Mockito.anyInt(),Mockito.any(Category.class))).thenThrow(ResourceNotFoundException.class);
+
+        this.mockMvc.perform(put("/category/{categoryId}",categoryId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCategory)))
+                .andExpect(status().isNotFound());
+
     }
 
 
-        @Test
+    @Test
     void deleteCategory() throws Exception {
 
         Integer categoryId=1;
